@@ -1,10 +1,11 @@
-import { root, timeElem, settingsMenu, header, closeBtn, colorPicker, hueSlider, satSlider, litSlider, glowSlider, formatToggle, secondsToggle, glowToggle, layoutToggle, themeToggle, rainbowOrbitToggle, adaptiveToggle, slideshowToggle, slideshowContainer, fadeControls, hElem, mElem, sWrap, slide1, slide2 } from './js/elements.js';
+import { root, timeElem, settingsMenu, header, closeBtn, colorPicker, hueSlider, satSlider, litSlider, glowSlider, formatToggle, secondsToggle, glowToggle, layoutToggle, themeToggle, rainbowOrbitToggle, adaptiveToggle, slideshowToggle, slideshowContainer, fadeControls, hElem, mElem, sWrap, slide1, slide2, trailToggle } from './js/elements.js';
 import { state } from './js/state.js';
 import { toggleFullscreen, hexToHsl } from './js/utils.js';
 import { updateColorFromGamepad, updateColorFromNative } from './js/color.js';
 import { applyGlow, setClockSize, updateGlowState, updateRainbowOrbitState, showUI, openMenu, updateClock } from './js/ui.js';
 import { fetchImageBatch, changeImage } from './js/slideshow.js';
 import { pollGamepad } from './js/gamepad.js';
+import { initCursorTrail } from './js/cursor.js';
 
 header.onpointerdown = (e) => {
     state.isDragging = true;
@@ -140,6 +141,12 @@ adaptiveToggle.addEventListener('change', () => {
     }
 });
 
+const cursorTrail = initCursorTrail();
+
+trailToggle.onchange = () => {
+    cursorTrail.setTrailActive(trailToggle.checked);
+};
+
 document.querySelectorAll('input[name="size-option"]').forEach(radio => {
     radio.onchange = (e) => setClockSize(e.target.value);
 });
@@ -187,6 +194,7 @@ const init = () => {
     layoutToggle.checked = localStorage.getItem('isStacked') === 'true';
     rainbowOrbitToggle.checked = localStorage.getItem('useRainbowOrbit') === 'true';
     slideshowToggle.checked = localStorage.getItem('useSlideshow') === 'true';
+    trailToggle.checked = (localStorage.getItem('useTrail') ?? 'true') === 'true';
     
     adaptiveToggle.checked = localStorage.getItem('useAdaptiveColor') === 'true';
     document.getElementById('color-row-native').classList.toggle('disabled-control', adaptiveToggle.checked);

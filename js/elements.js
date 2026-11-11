@@ -25,6 +25,7 @@ export const slide1 = document.getElementById('slide-1');
 export const slide2 = document.getElementById('slide-2');
 export const favicon = document.getElementById('favicon');
 export const timeElem = document.getElementById('time');
+export const trailToggle = document.getElementById('trail-toggle');
 
 export const canvas = document.createElement('canvas');
 canvas.width = 32;
