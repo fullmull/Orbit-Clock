@@ -29,12 +29,11 @@ function updateGlassDim(img) {
         const d = c.getImageData(0, 0, 32, 32).data;
         let lum = 0;
         for (let i = 0; i < d.length; i += 4) lum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
-        lum /= (d.length / 4) * 255; // 0 = black ... 1 = white
-        // aim for a glass that is never brighter than about lum 0.2 (a dark grey)
+        lum /= (d.length / 4) * 255;
         const dim = Math.min(0.95, Math.max(0.25, 0.24 / Math.max(lum, 0.01)));
         root.style.setProperty('--glass-dim', dim.toFixed(2));
     } catch {
-        root.style.removeProperty('--glass-dim'); // fall back to the fixed default in style.css
+        root.style.removeProperty('--glass-dim');
     }
 }
 
