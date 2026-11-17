@@ -66,6 +66,11 @@ body {
   opacity: 0;
 }
 
+body.cursor-idle,
+body.cursor-idle * {
+  cursor: none !important;
+}
+
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--main-color); outline-offset: 0.25rem; border-radius: 0.5rem; }
 

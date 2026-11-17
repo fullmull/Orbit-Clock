@@ -1,8 +1,8 @@
-import { root, timeElem, settingsMenu, header, closeBtn, colorPicker, hueSlider, satSlider, litSlider, glowSlider, formatToggle, secondsToggle, glowToggle, layoutToggle, themeToggle, rainbowOrbitToggle, adaptiveToggle, slideshowToggle, slideshowContainer, fadeControls, hElem, mElem, sWrap, slide1, slide2, trailToggle } from './js/elements.js';
+import { root, container, timeElem, settingsMenu, header, closeBtn, colorPicker, hueSlider, satSlider, litSlider, glowSlider, formatToggle, secondsToggle, glowToggle, layoutToggle, themeToggle, rainbowOrbitToggle, adaptiveToggle, slideshowToggle, slideshowContainer, fadeControls, hElem, mElem, sWrap, slide1, slide2, trailToggle } from './js/elements.js';
 import { state } from './js/state.js';
 import { toggleFullscreen, hexToHsl } from './js/utils.js';
 import { updateColorFromGamepad, updateColorFromNative } from './js/color.js';
-import { applyGlow, setClockSize, updateGlowState, updateRainbowOrbitState, showUI, openMenu, updateClock } from './js/ui.js';
+import { applyGlow, setClockSize, updateGlowState, updateRainbowOrbitState, showUI, hideUISoon, isOnClock, wakeCursor, openMenu, updateClock } from './js/ui.js';
 import { fetchImageBatch, changeImage } from './js/slideshow.js';
 import { pollGamepad } from './js/gamepad.js';
 import { initCursorTrail } from './js/cursor.js';
@@ -64,8 +64,15 @@ window.addEventListener('resize', () => {
     }
 });
 
-['pointermove', 'pointerdown'].forEach(ev => document.addEventListener(ev, () => {
-    showUI();
+let lastPointer = { x: NaN, y: NaN };
+
+['pointermove', 'pointerdown'].forEach(ev => document.addEventListener(ev, (e) => {
+    if (ev === 'pointermove' && e.clientX === lastPointer.x && e.clientY === lastPointer.y) return;
+    lastPointer = { x: e.clientX, y: e.clientY };
+
+    wakeCursor();
+    if (isOnClock(e.clientX, e.clientY)) showUI();
+    else if (e.pointerType !== 'touch') hideUISoon();
     if (state.isGamepadMode) {
         document.body.classList.remove('gamepad-mode');
         state.isGamepadMode = false;
@@ -157,12 +164,15 @@ document.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'f') toggleFullscreen();
 });
 
+container.addEventListener('pointerleave', (e) => {
+    if (e.pointerType !== 'touch' && !isOnClock(e.clientX, e.clientY)) hideUISoon();
+});
+
 document.addEventListener('pointerdown', (e) => {
     if (settingsMenu.style.display === 'block' &&
         !settingsMenu.contains(e.target) &&
         !timeElem.contains(e.target)) {
         settingsMenu.style.display = 'none';
-        showUI();
     }
 });
 
@@ -235,6 +245,7 @@ const init = () => {
     }, 6500);
 
     showUI();
+    wakeCursor();
 };
 
 function tick() {

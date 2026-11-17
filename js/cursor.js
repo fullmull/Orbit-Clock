@@ -78,22 +78,21 @@ export function initCursorTrail() {
   };
 
   function onMousemove(e) {
-    function o() {
-      lines = [];
-      for (var e = 0; e < E.trails; e++)
-        lines.push(new Line({ spring: 0.4 + (e / E.trails) * 0.025 }));
-    }
     function c(e) {
       if (!ctx.running || isHoveringSettings) return;
       (e.touches
         ? ((pos.x = e.touches[0].pageX), (pos.y = e.touches[0].pageY))
         : ((pos.x = e.clientX - 2), (pos.y = e.clientY - 2)),
         e.preventDefault());
+      wake();
     }
     function l(e) {
       if (!ctx.running || isHoveringSettings) return;
-      1 == e.touches.length &&
-        ((pos.x = e.touches[0].pageX), (pos.y = e.touches[0].pageY));
+      if (1 == e.touches.length) {
+        pos.x = e.touches[0].pageX;
+        pos.y = e.touches[0].pageY;
+        wake();
+      }
     }
     document.removeEventListener('mousemove', onMousemove);
     document.removeEventListener('touchstart', onMousemove);
@@ -101,7 +100,7 @@ export function initCursorTrail() {
     document.addEventListener('touchmove', c);
     document.addEventListener('touchstart', l);
     c(e);
-    o();
+    resetLines();
     if (!isRendering && !isHoveringSettings) {
       isRendering = true;
       render();
@@ -112,9 +111,45 @@ export function initCursorTrail() {
     return getComputedStyle(document.documentElement).getPropertyValue('--main-color').trim() || '#2830cc';
   }
 
+  const IDLE_DELAY = 150;
+  const FADE_IN = 100;
+  const FADE_OUT = 350;
+  let lastMoveTime = -Infinity;
+  let lastFrameTime = 0;
+  let visibility = 0;
+
+  function resetLines() {
+    lines = [];
+    for (var e = 0; e < E.trails; e++)
+      lines.push(new Line({ spring: 0.4 + (e / E.trails) * 0.025 }));
+  }
+
+  function wake() {
+    const now = performance.now();
+    lastMoveTime = now;
+    if (!isRendering) {
+      resetLines();
+      lastFrameTime = now;
+      isRendering = true;
+      render();
+    }
+  }
+
   let isRendering = false;
   function render() {
     if (!ctx.running || isHoveringSettings) {
+      isRendering = false;
+      return;
+    }
+    const now = performance.now();
+    const dt = Math.min(now - lastFrameTime, 50);
+    lastFrameTime = now;
+    const moving = now - lastMoveTime < IDLE_DELAY;
+    visibility = moving
+      ? Math.min(1, visibility + dt / FADE_IN)
+      : Math.max(0, visibility - dt / FADE_OUT);
+    if (!moving && visibility === 0) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       isRendering = false;
       return;
     }
@@ -122,7 +157,7 @@ export function initCursorTrail() {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.globalCompositeOperation = 'lighter';
     ctx.strokeStyle = getThemeColor();
-    ctx.globalAlpha = 0.25;
+    ctx.globalAlpha = 0.25 * visibility;
     ctx.lineWidth = 1;
     for (var e, t = 0; t < E.trails; t++) {
       if (lines[t]) {
@@ -139,9 +174,6 @@ export function initCursorTrail() {
   }
 
   function resizeCanvas() {
-    // Bitmap size and displayed size must be identical (1 canvas px = 1 CSS px),
-    // and the canvas must sit at the viewport origin, so that clientX/clientY
-    // map 1:1 onto canvas coordinates.
     const w = window.innerWidth;
     const h = window.innerHeight;
     ctx.canvas.width = w;
@@ -181,10 +213,7 @@ export function initCursorTrail() {
   resizeCanvas();
 
   if (ctx.running) {
-    lines = [];
-    for (var e = 0; e < E.trails; e++) {
-      lines.push(new Line({ spring: 0.4 + (e / E.trails) * 0.025 }));
-    }
+    resetLines();
     isRendering = true;
     render();
   }
@@ -194,10 +223,7 @@ export function initCursorTrail() {
       ctx.running = isActive;
       localStorage.setItem('useTrail', isActive);
       if (isActive) {
-        lines = [];
-        for (var e = 0; e < E.trails; e++) {
-          lines.push(new Line({ spring: 0.4 + (e / E.trails) * 0.025 }));
-        }
+        resetLines();
         if (!isRendering && !isHoveringSettings) {
           isRendering = true;
           render();

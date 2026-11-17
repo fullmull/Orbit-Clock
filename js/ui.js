@@ -24,18 +24,50 @@ export const updateRainbowOrbitState = () => {
     container.classList.toggle('rainbow-orbit', rainbowOrbitToggle.checked);
 };
 
+const hideUI = () => {
+    if (settingsMenu.style.display === 'block') return;
+    container.classList.add('hidden-ui');
+    fadeControls.classList.add('hidden-ui');
+    document.querySelectorAll('.gp-focus').forEach(e => e.classList.remove('gp-focus'));
+    if (document.activeElement) document.activeElement.blur();
+};
+
+let hideSoonTimer = null;
+
 export const showUI = () => {
     container.classList.remove('hidden-ui');
     fadeControls.classList.remove('hidden-ui');
     clearTimeout(state.fadeTimer);
-    state.fadeTimer = setTimeout(() => {
-        if (settingsMenu.style.display !== 'block') {
-            container.classList.add('hidden-ui');
-            fadeControls.classList.add('hidden-ui');
-            document.querySelectorAll('.gp-focus').forEach(e => e.classList.remove('gp-focus'));
-            if (document.activeElement) document.activeElement.blur();
-        }
-    }, 5000);
+    clearTimeout(hideSoonTimer);
+    hideSoonTimer = null;
+    state.fadeTimer = setTimeout(hideUI, 5000);
+};
+
+export const hideUISoon = (delay = 500) => {
+    if (hideSoonTimer || container.classList.contains('hidden-ui')) return;
+    hideSoonTimer = setTimeout(() => {
+        hideSoonTimer = null;
+        hideUI();
+    }, delay);
+};
+
+let closedRect = null;
+const rememberClosedRect = () => {
+    if (container.classList.contains('hidden-ui')) closedRect = container.getBoundingClientRect();
+};
+container.addEventListener('transitionend', rememberClosedRect);
+
+const inRect = (r, x, y) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+export const isOnClock = (x, y) =>
+    inRect(container.getBoundingClientRect(), x, y) ||
+    (closedRect !== null && !container.classList.contains('hidden-ui') && inRect(closedRect, x, y));
+
+const CURSOR_IDLE_MS = 1000;
+let cursorTimer = null;
+export const wakeCursor = () => {
+    document.body.classList.remove('cursor-idle');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(() => document.body.classList.add('cursor-idle'), CURSOR_IDLE_MS);
 };
 
 export const openMenu = () => {
