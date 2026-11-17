@@ -96,6 +96,7 @@ slideshowToggle.addEventListener('change', async () => {
         state.slideshowInterval = setInterval(changeImage, 20000);
     } else {
         document.body.classList.remove('slideshow-active');
+        root.style.removeProperty('--glass-dim');
         clearInterval(state.slideshowInterval);
         slide1.style.opacity = 0;
         slide2.style.opacity = 0;

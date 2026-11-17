@@ -1,4 +1,4 @@
-import { slide1, slide2, slideshowContainer, adaptiveToggle, hueSlider, satSlider, litSlider } from './elements.js';
+import { root, slide1, slide2, slideshowContainer, adaptiveToggle, hueSlider, satSlider, litSlider } from './elements.js';
 import { state } from './state.js';
 import { updateColorFromGamepad } from './color.js';
 
@@ -19,6 +19,25 @@ export async function fetchImageBatch() {
     }
 }
 
+function updateGlassDim(img) {
+    try {
+        const cvs = document.createElement('canvas');
+        cvs.width = cvs.height = 32;
+        const c = cvs.getContext('2d', { willReadFrequently: true });
+        const sw = img.naturalWidth / 2, sh = img.naturalHeight / 2;
+        c.drawImage(img, sw / 2, sh / 2, sw, sh, 0, 0, 32, 32);
+        const d = c.getImageData(0, 0, 32, 32).data;
+        let lum = 0;
+        for (let i = 0; i < d.length; i += 4) lum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+        lum /= (d.length / 4) * 255; // 0 = black ... 1 = white
+        // aim for a glass that is never brighter than about lum 0.2 (a dark grey)
+        const dim = Math.min(0.95, Math.max(0.25, 0.24 / Math.max(lum, 0.01)));
+        root.style.setProperty('--glass-dim', dim.toFixed(2));
+    } catch {
+        root.style.removeProperty('--glass-dim'); // fall back to the fixed default in style.css
+    }
+}
+
 export async function changeImage() {
     if (!state.isSlideshowActive) return;
     if (state.dynamicImageQueue.length === 0) {
@@ -35,6 +54,7 @@ export async function changeImage() {
     preloader.src = nextImage;
     try {
         await preloader.decode();
+        updateGlassDim(preloader);
         if (adaptiveToggle.checked) {
             const cvs = document.createElement('canvas');
             const cCtx = cvs.getContext('2d', { willReadFrequently: true });

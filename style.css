@@ -7,8 +7,19 @@
 :root {
     --bg-color: #000;
     --container-bg: rgba(15, 15, 15, 0.85);
-    --text-muted: #444;
+    --text-muted: rgba(255, 255, 255, 0.5);
     --border-color: rgba(255, 255, 255, 0.05);
+
+    --glass-filter: blur(28px) saturate(170%) brightness(var(--glass-dim, 0.55));
+    --glass-tint: rgba(0, 0, 0, 0.18);
+    --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(255, 255, 255, 0.08) 100%);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.1) 26%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 74%, rgba(255, 255, 255, 0.5) 100%);
+    --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.35),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+                    inset 0 -1px 1px rgba(255, 255, 255, 0.1),
+                    inset 0 0 28px rgba(255, 255, 255, 0.05);
+
     --main-color: #2830cc;
     --glow-blur: 15px;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -24,8 +35,18 @@
 [data-theme="light"] {
     --bg-color: #f0f0f0;
     --container-bg: rgba(255, 255, 255, 0.9);
-    --text-muted: #aaa;
+    --text-muted: rgba(0, 0, 0, 0.5);
     --border-color: rgba(0, 0, 0, 0.1);
+
+    --glass-filter: blur(28px) saturate(180%) brightness(1.15);
+    --glass-tint: rgba(255, 255, 255, 0.38);
+    --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0.35) 100%);
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-rim: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.25) 26%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.25) 74%, rgba(255, 255, 255, 0.9) 100%);
+    --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.18),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+                    inset 0 -1px 1px rgba(255, 255, 255, 0.4),
+                    inset 0 0 28px rgba(255, 255, 255, 0.3);
 }
 
 * { box-sizing: border-box; }
@@ -113,12 +134,29 @@ body:not(.is-loaded) #clock-container {
     max-height: 92dvh;
     --box-radius: 2.5rem;
     padding: clamp(1.5rem, 4vmin, 3rem) calc(clamp(2rem, 6vmin, 5rem) * var(--size-scale));
-    background: var(--container-bg);
-    border: 1px solid var(--border-color);
-    backdrop-filter: blur(15px);
+    background: var(--glass-sheen), var(--glass-tint);
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
     border-radius: var(--box-radius);
     z-index: 1;
     transition: var(--transition-main), box-shadow 0.3s ease;
+}
+
+#clock-container::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: var(--box-radius);
+    background: var(--glass-rim);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 4;
 }
 
 #clock-container.hidden-ui {
