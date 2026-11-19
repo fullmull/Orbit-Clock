@@ -97,6 +97,7 @@ slideshowToggle.addEventListener('change', async () => {
     } else {
         document.body.classList.remove('slideshow-active');
         root.style.removeProperty('--glass-dim');
+        root.classList.remove('bg-dark');
         clearInterval(state.slideshowInterval);
         slide1.style.opacity = 0;
         slide2.style.opacity = 0;

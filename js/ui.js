@@ -58,6 +58,7 @@ const rememberClosedRect = () => {
 container.addEventListener('transitionend', rememberClosedRect);
 
 const inRect = (r, x, y) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+
 export const isOnClock = (x, y) =>
     inRect(container.getBoundingClientRect(), x, y) ||
     (closedRect !== null && !container.classList.contains('hidden-ui') && inRect(closedRect, x, y));

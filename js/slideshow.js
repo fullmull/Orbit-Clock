@@ -32,8 +32,10 @@ function updateGlassDim(img) {
         lum /= (d.length / 4) * 255;
         const dim = Math.min(0.95, Math.max(0.25, 0.24 / Math.max(lum, 0.01)));
         root.style.setProperty('--glass-dim', dim.toFixed(2));
+        root.classList.toggle('bg-dark', lum < 0.5);
     } catch {
         root.style.removeProperty('--glass-dim');
+        root.classList.remove('bg-dark');
     }
 }
 

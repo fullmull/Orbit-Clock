@@ -5,16 +5,16 @@
 }
 
 :root {
-    --bg-color: #000;
+    --bg-color: #000000;
     --container-bg: rgba(15, 15, 15, 0.85);
     --text-muted: rgba(255, 255, 255, 0.5);
     --border-color: rgba(255, 255, 255, 0.05);
 
-    --glass-filter: blur(28px) saturate(170%) brightness(var(--glass-dim, 0.55));
-    --glass-tint: rgba(0, 0, 0, 0.18);
-    --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(255, 255, 255, 0.08) 100%);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.1) 26%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 74%, rgba(255, 255, 255, 0.5) 100%);
+    --glass-filter: blur(28px);
+    --glass-tint: transparent;
+    --glass-sheen: none;
+    --glass-border: rgba(0, 0, 0, 0);
+    --glass-rim: linear-gradient(135deg, rgba(50, 50, 50, 0.15) 0%, rgba(255, 255, 255, 0.1) 26%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 74%, rgba(50, 50, 50, 0.5) 100%);
     --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.35),
                     inset 0 1px 1px rgba(255, 255, 255, 0.3),
                     inset 0 -1px 1px rgba(255, 255, 255, 0.1),
@@ -33,20 +33,15 @@
 }
 
 [data-theme="light"] {
-    --bg-color: #f0f0f0;
+    --bg-color: #ffffff;
     --container-bg: rgba(255, 255, 255, 0.9);
     --text-muted: rgba(0, 0, 0, 0.5);
     --border-color: rgba(0, 0, 0, 0.1);
+    --glass-dim: 0.25;
+}
 
-    --glass-filter: blur(28px) saturate(180%) brightness(1.15);
-    --glass-tint: rgba(255, 255, 255, 0.38);
-    --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0.35) 100%);
-    --glass-border: rgba(0, 0, 0, 0.06);
-    --glass-rim: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.25) 26%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.25) 74%, rgba(255, 255, 255, 0.9) 100%);
-    --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.18),
-                    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-                    inset 0 -1px 1px rgba(255, 255, 255, 0.4),
-                    inset 0 0 28px rgba(255, 255, 255, 0.3);
+[data-theme="light"].bg-dark {
+    --text-muted: rgba(255, 255, 255, 0.6);
 }
 
 * { box-sizing: border-box; }
